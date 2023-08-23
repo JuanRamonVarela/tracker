@@ -1,0 +1,7 @@
+env
+rumipress/__pycache__
+rumipress/__init__.py
+tracker/__pycache__
+tracker/__init__.py
+tracker/migrations/__pycache__
+tracker/migrations/__init__.py

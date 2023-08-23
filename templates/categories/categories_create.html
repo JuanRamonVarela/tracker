@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>CATEGORIES</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url  'index' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active"><a href="{% url  'categories' %}">Categories</a></li></li>
+          <li class="breadcrumb-item active">Create</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+    <section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+            <h5 class="card-title">NEW CATEGORY</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="category">Category Name:</label>
+                    {% if form %}
+                    <input type="search" name="category" id="category" class="form-control mt-1" placeholder="Category Name" value="{{form.category}}" onkeypress='return validateKeypress(/[ a-zA-Z0-9ñÑáéíóúÁÉÍÓÚüÜ.!()+=&-]/g)' required>
+                    {% else %}
+                    <input type="search" name="category" id="category" class="form-control mt-1" placeholder="Category Name" onkeypress='return validateKeypress(/[ a-zA-Z0-9ñÑáéíóúÁÉÍÓÚüÜ.!()+=&-]/g)' required>
+                    {% endif %}
+                    
+                </div>
+                
+                {% if msg %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> {{msg.error}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+                <button class="btn btn-primary col-12">Save</button>
+            </form>
+            </div>
+        </div>
+
+        </div>
+    </div>
+</main>
+
+{% endblock %}
