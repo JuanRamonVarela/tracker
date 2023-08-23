@@ -29,27 +29,26 @@
                       <th>Author</th>
                       <th>Released</th>
                       <th>Category</th>
-                      <th>User</th>
                       <th>Expense</th>
-                      <th>Date</th>
                       <th>Options</th>
                   </thead>
                   <tbody>
                     {% for book in books %}
                         <tr>
-                            
                             <td>{{book.book_code}}</td>
                             <td>{{book.title}}</td>
                             <td>{{book.subtitle}}</td>
                             <td>{{book.author}}</td>
                             <td>{{book.publishing_date}}</td>
                             <td>{{book.category}}</td>
-                            <td>{{book.user}}</td>
                             <td>{{book.distribution_expense}}</td>
-                            <td>{{book.date}}</td>
-                            <td></td>
-                            
-                            
+                            <td>
+                              <form action="{% url 'remove_book' book.id %}" method="post" class="d-inline-flex">
+                                <a href="javascript:void(0);" class="text-danger" onclick="this.parentNode.submit()">
+                                  <i class="fa fa-trash"></i>
+                                </a>
+                              </form>
+                            </td>
                         </tr>
                     {% endfor %}
                   </tbody>

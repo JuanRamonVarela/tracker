@@ -77,10 +77,12 @@ def update_category(request, pk):
 
 @login_required
 def remove_category(request, pk):
-    cat=get_object_or_404(Categories, pk=pk)
     if request.method=="POST":
+        cat=get_object_or_404(Categories, pk=pk)
         cat.delete()
         return redirect('categories')
+    else:
+        return redirect('404')
 
 @login_required
 def BooksView(request):
@@ -130,6 +132,18 @@ def CreateBook(request):
                 'categories':categories,
                 'msg':{'error':err},
             })
+        
+def remove_book(request, pk):
+    if request.method == "POST":
+        book=get_object_or_404(Books, pk=pk)
+        if request.method=="POST":
+            book.delete()
+            return redirect('books')
+    else:
+        return redirect('404')
+
+def not_found(request):
+    return render(request, '404.html')
 
 def signin(request):
     if request.method=="GET":

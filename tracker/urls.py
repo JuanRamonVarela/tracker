@@ -12,6 +12,8 @@ urlpatterns=[
     # books url
     path('books/', views.BooksView, name='books'),
     path('books/create/', views.CreateBook, name='create_books'),
+    path('books/<int:pk>/remove/', views.remove_book, name='remove_book'),
     # login url
     path('login/', views.signin, name='signing'),
+    path('404/', views.not_found, name='404' ),
 ]
