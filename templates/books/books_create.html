@@ -22,6 +22,52 @@
                 
                 <form method="post">
                     {% csrf_token %}
+                    <!-- if form exist pass data -->
+                    {% if form %}
+                    <div class="mb-3">
+                        <label for="code">Code:</label>
+                        <input type="number" step="1" name="code" id="code" value='{{form.code}}' class="form-control mt-1" placeholder="Code No" onkeypress='return validateKeypress(/[ 0-9]/g)' required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title">Title:</label>
+                        <input type="search" name="title" id="title" value='{{form.title}}' class="form-control mt-1" placeholder="Title" onkeypress='return validateKeypress(/[ a-zA-Z0-9ñÑáéíóúÁÉÍÓÚüÜ.!()+=&-]/g)' required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subtitle">Subtitle:</label>
+                        <input type="search" name="subtitle" id="subtitle" value='{{form.subtitle}}' class="form-control mt-1" placeholder="Subtitle" onkeypress='return validateKeypress(/[ a-zA-Z0-9ñÑáéíóúÁÉÍÓÚüÜ.!()+=&-]/g)' required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="author">Author:</label>
+                        <input type="search" name="author" id="author" value='{{form.author}}' class="form-control mt-1" placeholder="Author" onkeypress='return validateKeypress(/[ a-zA-Z0-9ñÑáéíóúÁÉÍÓÚüÜ.!()+=&-]/g)' required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="released">Released:</label>
+                        <input type="date" name="released" id="released" value='{{form.released}}' class="form-control mt-1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="publisher">Publisher:</label>
+                        <input type="search" name="publisher" id="publisher" value='{{form.publisher}}' class="form-control mt-1" placeholder="Publisher" onkeypress='return validateKeypress(/[ a-zA-Z0-9ñÑáéíóúÁÉÍÓÚüÜ.!()+=&-]/g)' required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="">Category:</label>
+                        <select name="category" id="category" class="form-select" required>
+                            <option value="">-- SELECT CATEGORY --</option>
+                            {% for category in categories %}
+                                <option value="{{category.id}}" 
+                                {% if category.id|slugify == form.category|slugify %} selected {% endif %}>
+                                    {{category.category}}
+                                </option>
+                                
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="expense">Distribution Expense:</label>
+                        <input type="number" name="expense" id="expense" value='{{form.expense}}' class="form-control mt-1" placeholder="Distribution Expense" onkeypress='return validateKeypress(/[ 0-9.]/g)' required>
+                    </div>
+
+                    <!-- if not just show the form without data -->
+                    {% else %}
                     <div class="mb-3">
                         <label for="code">Code:</label>
                         <input type="number" step="1" name="code" id="code" class="form-control mt-1" placeholder="Code No" onkeypress='return validateKeypress(/[ 0-9]/g)' required>
@@ -48,9 +94,9 @@
                     </div>
                     <div class="mb-3">
                         <label for="">Category:</label>
-                        <select name="category_id" id="category_id" class="form-select">
+                        <select name="category" id="category" class="form-select" required>
                             <option value="">-- SELECT CATEGORY --</option>
-                            {% for category in categories%}
+                            {% for category in categories %}
                             <option value="{{category.id}}">{{category.category}}</option>
                             {% endfor %}
                         </select>
@@ -59,6 +105,8 @@
                         <label for="expense">Distribution Expense:</label>
                         <input type="number" name="expense" id="expense" class="form-control mt-1" placeholder="Distribution Expense" onkeypress='return validateKeypress(/[ 0-9.]/g)' required>
                     </div>
+                    {% endif %}
+                    <!-- Alert Messages -->
                     {% if msg %}
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <strong>Error!</strong> {{msg.error}}

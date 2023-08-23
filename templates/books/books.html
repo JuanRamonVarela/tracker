@@ -25,15 +25,33 @@
                   <thead>
                       <th>#</th>
                       <th>Title</th>
+                      <th>Subtitle</th>
                       <th>Author</th>
                       <th>Released</th>
                       <th>Category</th>
                       <th>User</th>
-                      <th>Date</th>
                       <th>Expense</th>
+                      <th>Date</th>
+                      <th>Options</th>
                   </thead>
                   <tbody>
-                    
+                    {% for book in books %}
+                        <tr>
+                            
+                            <td>{{book.book_code}}</td>
+                            <td>{{book.title}}</td>
+                            <td>{{book.subtitle}}</td>
+                            <td>{{book.author}}</td>
+                            <td>{{book.publishing_date}}</td>
+                            <td>{{book.category}}</td>
+                            <td>{{book.user}}</td>
+                            <td>{{book.distribution_expense}}</td>
+                            <td>{{book.date}}</td>
+                            <td></td>
+                            
+                            
+                        </tr>
+                    {% endfor %}
                   </tbody>
               </table>
             </div>

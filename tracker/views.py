@@ -10,23 +10,26 @@ from .models import Categories, Books
 def index(request):
     return render(request, 'index.html',{'user':request.user})
 
-def validateCategory(category):
-    if category.isspace()==True:
-                raise Exception("The category can't be just spaces")
-            
-    elif category.isnumeric():
-        raise Exception("The category can't be just numbers")
+def validate(field, value):
+    # validate no only spaces
+    if value.isspace()==True:
+                raise Exception("The "+field+" can't be just spaces")
     
+    # validate no only numbers
+    elif value.isnumeric():
+        raise Exception("The "+field+" can't be just numbers")
+    
+    # validate no only symbols
     else:
         valid_symbols = " .!()+=&-"
-        for ch in category:
+        for ch in value:
             if ch not in valid_symbols:
                 just_symbols=False
             else:
                 just_symbols=True
 
     if just_symbols:
-        raise Exception("Your input contains symbols only")
+        raise Exception("The "+field+" can't be just symbols")
     
 def CategoriesView(request):
     categories=Categories.objects.filter(active=True).all()
@@ -41,11 +44,12 @@ def CreateCategory(request):
             # get category from POST
             category=request.POST['category']
             # validate category value
-            validateCategory(category)
+            validate('caregory',category)
             cat=Categories.objects.create(
                 category=request.POST['category'],
                 user_id=request.user.id
             )
+            # if insert redirect to categories
             if cat:
                 return redirect('categories')
         except Exception as err:
@@ -62,7 +66,7 @@ def update_category(request, pk):
     else:
         try:
             cat=request.POST['category']
-            validateCategory(cat)
+            validate('category', cat)
             if Categories.objects.filter(pk=pk).update(category=cat):
                 return redirect('categories')
         except Exception as err:
@@ -81,12 +85,51 @@ def remove_category(request, pk):
 @login_required
 def BooksView(request):
     if request.method=="GET":
-        return render(request, 'books/books.html',{})
+        books=Books.objects.filter(active=True).all()
+        return render(request, 'books/books.html',{'books':books})
 
 @login_required
 def CreateBook(request):
     categories=Categories.objects.filter(active=True).all().values('id','category').order_by('category')
-    return render(request, 'books/books_create.html',{'categories':categories})
+    if request.method=="GET":
+        return render(request, 'books/books_create.html',{'categories':categories})
+    else:
+        try:
+            # get data from POST
+            code=request.POST['code']
+            title=request.POST['title']
+            subtitle=request.POST["subtitle"]
+            author=request.POST['author']
+            released=request.POST["released"]
+            publisher=request.POST["publisher"]
+            category=request.POST["category"]
+            expense=request.POST["expense"]
+            
+            # validate fields value
+            validate('book', title)
+            validate('subtitle', subtitle)
+            validate('author', author)
+            validate('publisher', publisher)
+
+            book=Books.objects.create(
+                book_code=code,
+                title=title,
+                subtitle=subtitle,
+                author=author,
+                publishing_date=released,
+                publisher=publisher,
+                category_id=category,
+                user_id=request.user.id,
+                distribution_expense=expense
+            )
+            if book:
+                return redirect('books')
+        except Exception as err:
+            return render(request, "books/books_create.html",{
+                'form':request.POST,
+                'categories':categories,
+                'msg':{'error':err},
+            })
 
 def signin(request):
     if request.method=="GET":
