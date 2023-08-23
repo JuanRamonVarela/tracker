@@ -90,9 +90,11 @@ def BooksView(request):
         books=Books.objects.filter(active=True).all()
         return render(request, 'books/books.html',{'books':books})
 
+# define categories to use in books forms
+categories=Categories.objects.filter(active=True).all().values('id','category').order_by('category')
+    
 @login_required
 def CreateBook(request):
-    categories=Categories.objects.filter(active=True).all().values('id','category').order_by('category')
     if request.method=="GET":
         return render(request, 'books/books_create.html',{'categories':categories})
     else:
@@ -132,7 +134,49 @@ def CreateBook(request):
                 'categories':categories,
                 'msg':{'error':err},
             })
-        
+
+@login_required
+def update_book(request, pk):
+    books=Books.objects.filter(pk=pk, active=True).all().values()
+    if request.method=='GET':
+        return render(request, 'books/books_update.html',{'books':books,'categories':categories})
+    else:
+        try:
+        # get data from POST
+            code=request.POST['code']
+            title=request.POST['title']
+            subtitle=request.POST["subtitle"]
+            author=request.POST['author']
+            released=request.POST["released"]
+            publisher=request.POST["publisher"]
+            category=request.POST["category"]
+            expense=request.POST["expense"]
+            
+            # validate fields value
+            validate('book', title)
+            validate('subtitle', subtitle)
+            validate('author', author)
+            validate('publisher', publisher)
+            
+            if Books.objects.filter(pk=pk).update(
+                book_code=code,
+                title=title,
+                subtitle=subtitle,
+                author=author,
+                publishing_date=released,
+                publisher=publisher,
+                category_id=category,
+                user_id=request.user.id,
+                distribution_expense=expense):
+                return redirect('books')
+        except Exception as err:
+            return render(request, "books/books_create.html",{
+            'form':request.POST,
+            'categories':categories,
+            'msg':{'error':err},
+            })
+
+@login_required
 def remove_book(request, pk):
     if request.method == "POST":
         book=get_object_or_404(Books, pk=pk)

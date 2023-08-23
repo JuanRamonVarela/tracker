@@ -11,6 +11,7 @@ urlpatterns=[
     path('categories/<int:pk>/remove/', views.remove_category, name='remove_category'),
     # books url
     path('books/', views.BooksView, name='books'),
+    path('books/<int:pk>/update/', views.update_book, name='update_book'),
     path('books/create/', views.CreateBook, name='create_books'),
     path('books/<int:pk>/remove/', views.remove_book, name='remove_book'),
     # login url

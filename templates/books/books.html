@@ -43,6 +43,9 @@
                             <td>{{book.category}}</td>
                             <td>{{book.distribution_expense}}</td>
                             <td>
+                              <a href="{% url 'update_book' book.id %}" class="text-info">
+                                <i class="fa fa-pen-to-square"></i>
+                              </a>
                               <form action="{% url 'remove_book' book.id %}" method="post" class="d-inline-flex">
                                 <a href="javascript:void(0);" class="text-danger" onclick="this.parentNode.submit()">
                                   <i class="fa fa-trash"></i>
