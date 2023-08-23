@@ -82,7 +82,12 @@ def remove_category(request, pk):
 def BooksView(request):
     if request.method=="GET":
         return render(request, 'books/books.html',{})
-    
+
+@login_required
+def CreateBook(request):
+    categories=Categories.objects.filter(active=True).all().values('id','category').order_by('category')
+    return render(request, 'books/books_create.html',{'categories':categories})
+
 def signin(request):
     if request.method=="GET":
         return render(request, 'signin.html',{
