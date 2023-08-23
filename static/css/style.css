@@ -684,11 +684,15 @@ h6 {
   align-items: center;
   font-size: 1.1em;
   font-weight: 600;
-  color: #4154f1;
+  color: darkslateblue;
   transition: 0.3;
   background: #f6f9ff;
   padding: 10px;
   border-radius: 4px;
+}
+
+.sidebar-nav > .nav-item > .nav-link.active {
+  color: #4154f1;
 }
 
 .sidebar-nav .nav-link i {
