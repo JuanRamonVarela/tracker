@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .models import Categories, Books
+from .models import Categories, Books, Delivery, DeliveryProspect
 # Create your views here.
 
 @login_required
@@ -13,7 +13,7 @@ def index(request):
 def validate(field, value):
     # validate no only spaces
     if value.isspace()==True:
-                raise Exception("The "+field+" can't be just spaces")
+        raise Exception("The "+field+" can't be just spaces")
     
     # validate no only numbers
     elif value.isnumeric():
@@ -185,6 +185,58 @@ def remove_book(request, pk):
             return redirect('books')
     else:
         return redirect('404')
+
+@login_required
+def DeliveryView(request):
+    return render(request, 'deliveries/deliveries.html')
+
+@login_required
+def CreateDelivery(request):
+    if request.method=="GET":
+        return render(request, 'deliveries/deliveries_create.html')
+    else:
+        try:
+            # get category from POST
+            book=request.POST['book_code']
+            qty=request.POST["qty"]
+            date=request.POST['date']
+            # validate category value
+            if book.isspace()==True:
+                raise Exception("The book code can't be just spaces")
+            # Search book
+            # print(book)
+            book_row=Books.objects.filter(book_code=book).all().values()
+            # if doesn't exist trhow except
+            if len(book_row) == 0:
+                raise Exception("Book not found. Try with another book code.")
+            # if exist get info
+            #print(book_row)
+            book_code=book_row[0]['id']
+            category=book_row[0]['category_id']
+            price=book_row[0]['distribution_expense']
+            total=int(qty)*float(price)
+            #print(price)
+            #format 2 decimals
+            total=float(f'{total:.2f}')
+            #print(total)
+            
+            delit=Delivery.objects.create(
+                book_id=book_code,
+                category_id=category,
+                unit_price=price,
+                qty=qty,
+                total=total,
+                date=date,
+                user_id=request.user.id
+            )
+            # if insert redirect to categories
+            if delit:
+                return redirect('deliveries')
+        except Exception as err:
+            return render(request, "deliveries/deliveries_create.html",{
+                'form':request.POST, 
+                'msg':{'error':err},
+            })
 
 def not_found(request):
     return render(request, '404.html')

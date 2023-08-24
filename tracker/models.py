@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -25,4 +26,28 @@ class Books(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reg')
     date=models.DateField(auto_now=True)
     distribution_expense=models.DecimalField(max_digits=6, decimal_places=2)
+    active=models.BooleanField(default=True)
+
+class Delivery(models.Model):
+    # if book deleted delivery too
+    book=models.ForeignKey(Books, on_delete=models.CASCADE)
+    category=models.ForeignKey(Categories, on_delete=models.PROTECT)
+    unit_price=models.DecimalField(max_digits=6, decimal_places=2)
+    qty=models.IntegerField()
+    total=models.DecimalField(max_digits=6, decimal_places=2)
+    date=models.DateField()
+    # if user deleted delivery too
+    user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="admin")
+    active=models.BooleanField(default=True)
+
+class DeliveryProspect(models.Model):
+    # if book deleted delivery too
+    book=models.ForeignKey(Books, on_delete=models.CASCADE, related_name='book_test')
+    category=models.ForeignKey(Categories, on_delete=models.PROTECT, related_name='category_test')
+    unit_price=models.DecimalField(max_digits=6, decimal_places=2)
+    qty=models.IntegerField()
+    total=models.DecimalField(max_digits=6, decimal_places=2)
+    date=models.DateField()
+    # if user deleted delivery too
+    user=models.ForeignKey(User, on_delete=models.CASCADE, related_name="admin_test")
     active=models.BooleanField(default=True)

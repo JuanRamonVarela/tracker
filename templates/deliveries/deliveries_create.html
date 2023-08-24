@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Deliveries Distribution</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url  'index' %}">Dashboard</a></li>
+          <li class="breadcrumb-item active"><a href="{% url  'deliveries' %}">Deliveries Distribution</a></li>
+          <li class="breadcrumb-item active">Create</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+    <section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">NEW DELIVERY</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="book_code">Book Code:</label>
+                        <input type="number" name="book_code" min="0" class="form-control" placeholder="Book Code" onkeypress='return validateKeypress(/[ 0-9]/g)' id="book_code" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="book_code">Quantity:</label>
+                        <input type="number" name="qty" min="1" class="form-control" placeholder="Quantity" onkeypress='return validateKeypress(/[ 0-9]/g)' id="qty" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date">Date:</label>
+                        <input type="date" name="date" class="form-control" id="date" required>
+                    </div>
+                    {% if msg %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error!</strong> {{msg.error}}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    <button class="btn btn-primary col-12">Deliver Book</button>
+                </form>
+            </div>
+          </div>
+        </div>
+    </div>
+</main>
+<script>
+  document.getElementById('tab-delivery').classList.add('active')
+  const date = new Date()
+    today=document.getElementById('date');
+    const getTwoDigits = (value) => value < 10 ? `0${value}` : value;
+    today.value = `${date.getFullYear()}-${getTwoDigits(date.getMonth() + 1)}-${date.getDate().toString().padStart(2, "0")}`;
+</script>
+{% endblock %}
