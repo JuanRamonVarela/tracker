@@ -25,10 +25,22 @@
                   <thead>
                       <th>Title</th>
                       <th>Author</th>
-                      <th>Expense</th>
+                      <th>Unit</th>
+                      <th>Qty</th>
+                      <th>Total</th>
                       <th>Options</th>
                   </thead>
                   <tbody>
+                    {% for delivery in deliveries %}
+                        <tr>
+                            <td>{{delivery.book.title}}</td>
+                            <td>{{delivery.book.author}}</td>
+                            <td>{{delivery.book.distribution_expense}}</td>
+                            <td>{{delivery.qty}}</td>
+                            <td>{{delivery.total}}</td>
+                            <td></td>
+                        </tr>
+                    {% endfor %}
                   </tbody>
               </table>
             </div>

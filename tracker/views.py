@@ -188,7 +188,9 @@ def remove_book(request, pk):
 
 @login_required
 def DeliveryView(request):
-    return render(request, 'deliveries/deliveries.html')
+    if request.method=="GET":
+        deliveries=Delivery.objects.filter(active=True).all()
+        return render(request, 'deliveries/deliveries.html', {'deliveries':deliveries})
 
 @login_required
 def CreateDelivery(request):
