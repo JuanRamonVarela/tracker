@@ -44,6 +44,11 @@
                                 <a href="{% url 'update_deliveries' delivery.id %}" class="text-info">
                                     <i class="fa fa-pen-to-square"></i>
                                 </a>
+                                <form action="{% url 'remove_deliveries' delivery.id %}" method="post" class="d-inline-flex">
+                                  <a href="javascript:void(0);" class="text-danger" onclick="this.parentNode.submit()">
+                                    <i class="fa fa-trash"></i>
+                                  </a>
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}

@@ -21,7 +21,7 @@ urlpatterns=[
     path('delivery/', views.DeliveryView, name='deliveries'),
     path('delivery/create/', views.CreateDelivery, name='create_deliveries'),
     path('delivery/<int:pk>/update/', views.update_deliveries, name='update_deliveries'),
-    path('delivery/<int:pk>/remove/', views.DeliveryView, name='remove_deliveries'),
+    path('delivery/<int:pk>/remove/', views.remove_deliveries, name='remove_deliveries'),
     
     # login url
     path('login/', views.signin, name='signing'),

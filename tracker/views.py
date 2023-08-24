@@ -277,6 +277,16 @@ def update_deliveries(request, pk):
                 'msg':{'error':err},
             })
 
+@login_required
+def remove_deliveries(request, pk):
+    if request.method == "POST":
+        delivery=get_object_or_404(Delivery, pk=pk)
+        if request.method=="POST":
+            delivery.delete()
+            return redirect('deliveries')
+    else:
+        return redirect('404')
+
 def not_found(request):
     return render(request, '404.html')
 
