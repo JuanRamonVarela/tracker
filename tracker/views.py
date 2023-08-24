@@ -4,11 +4,36 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Categories, Books, Delivery, DeliveryProspect
+from datetime import date
+from django.db.models import Sum, DecimalField, OuterRef, Subquery
 # Create your views here.
 
 @login_required
 def index(request):
-    return render(request, 'index.html',{'user':request.user})
+    today = date.today().strftime("%Y-%m-%d")
+    month=date.today().strftime("%m")
+    # calculate today deliveries
+    #deliveries_today=Delivery.objects.raw("SELECT id, sum(total) as total, sum(qty) as qty  from tracker_delivery WHERE date='"+d1+"'")
+    deliveries_today=Delivery.objects.filter(date=today).aggregate(Sum('qty'), Sum('total'))
+    # calculate month deliveries
+    deliveries_month=Delivery.objects.filter(date__month=month).aggregate(Sum('qty'), Sum('total'))
+    # calculate today categories expense
+
+    # prepare a subquery to get categories name
+    cat_subquery=Categories.objects.filter(id=OuterRef('category_id')).values('category')
+    chart_today=Delivery.objects.filter(date=today).values('category').annotate(
+    total=Sum(('total'), output_field=DecimalField()),
+    # get total and cateries name by today
+    category_name=Subquery(cat_subquery))
+    # get total and cateries name by month
+    chart_month=Delivery.objects.filter(date__month=month).values('category').annotate(
+    total=Sum(('total'), output_field=DecimalField()),
+    category_name=Subquery(cat_subquery))
+
+    print(chart_today)
+    #print(deliveries_today)
+    return render(request, 'index.html',{'user':request.user, 'data':{'dev_today':deliveries_today,
+    'dev_month':deliveries_month}, 'chart_today':chart_today, 'chart_month':chart_month})
 
 def validate(field, value):
     # validate no only spaces
