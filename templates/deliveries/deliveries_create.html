@@ -23,15 +23,15 @@
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="book_code">Book Code:</label>
-                        <input type="number" name="book_code" min="0" class="form-control" placeholder="Book Code" onkeypress='return validateKeypress(/[ 0-9]/g)' id="book_code" required>
+                        <input type="number" name="book_code" min="0" value="{{form.book_code}}" class="form-control" placeholder="Book Code" onkeypress='return validateKeypress(/[ 0-9]/g)' id="book_code" required>
                     </div>
                     <div class="mb-3">
-                        <label for="book_code">Quantity:</label>
-                        <input type="number" name="qty" min="1" class="form-control" placeholder="Quantity" onkeypress='return validateKeypress(/[ 0-9]/g)' id="qty" required>
+                        <label for="qty">Quantity:</label>
+                        <input type="number" name="qty" min="1" class="form-control" value="{{form.qty}}" placeholder="Quantity" onkeypress='return validateKeypress(/[ 0-9]/g)' id="qty" required>
                     </div>
                     <div class="mb-3">
                         <label for="date">Date:</label>
-                        <input type="date" name="date" class="form-control" id="date" required>
+                        <input type="date" name="date" class="form-control" value="{{form.date}}" id="date" required>
                     </div>
                     {% if msg %}
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">

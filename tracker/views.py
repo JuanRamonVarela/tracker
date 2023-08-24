@@ -27,9 +27,12 @@ def validate(field, value):
                 just_symbols=False
             else:
                 just_symbols=True
+        
+        if field=="subtitle":
+            just_symbols=False
 
-    if just_symbols:
-        raise Exception("The "+field+" can't be just symbols")
+        if just_symbols:
+            raise Exception("The "+field+" can't be just symbols")
     
 def CategoriesView(request):
     categories=Categories.objects.filter(active=True).all()
@@ -192,37 +195,44 @@ def DeliveryView(request):
         deliveries=Delivery.objects.filter(active=True).all()
         return render(request, 'deliveries/deliveries.html', {'deliveries':deliveries})
 
-@login_required
-def CreateDelivery(request):
-    if request.method=="GET":
-        return render(request, 'deliveries/deliveries_create.html')
+def DeliveryOptions(request, t, pk):
+    # get category from POST
+    
+    book=request.POST['book_code']
+    qty=request.POST["qty"]
+    date=request.POST['date']
+    # validate category value
+    if book.isspace()==True:
+        raise Exception("The book code can't be just spaces")
+    # Search book
+    # print(book)
+    book_row=Books.objects.filter(book_code=book).all().values()
+    # if doesn't exist trhow except
+    if len(book_row) == 0:
+        raise Exception("Book not found. Try with another book code.")
+    # if exist get info
+    book_code=book_row[0]['id']
+    category=book_row[0]['category_id']
+    price=book_row[0]['distribution_expense']
+    total=int(qty)*float(price)
+
+    #format 2 decimals
+    total=float(f'{total:.2f}')
+    #print(total)
+    if t=="add":
+        delit=Delivery.objects.create(
+            book_id=book_code,
+            category_id=category,
+            unit_price=price,
+            qty=qty,
+            total=total,
+            date=date,
+            user_id=request.user.id
+        )
+        if delit:
+            return True
     else:
-        try:
-            # get category from POST
-            book=request.POST['book_code']
-            qty=request.POST["qty"]
-            date=request.POST['date']
-            # validate category value
-            if book.isspace()==True:
-                raise Exception("The book code can't be just spaces")
-            # Search book
-            # print(book)
-            book_row=Books.objects.filter(book_code=book).all().values()
-            # if doesn't exist trhow except
-            if len(book_row) == 0:
-                raise Exception("Book not found. Try with another book code.")
-            # if exist get info
-            #print(book_row)
-            book_code=book_row[0]['id']
-            category=book_row[0]['category_id']
-            price=book_row[0]['distribution_expense']
-            total=int(qty)*float(price)
-            #print(price)
-            #format 2 decimals
-            total=float(f'{total:.2f}')
-            #print(total)
-            
-            delit=Delivery.objects.create(
+        if Delivery.objects.filter(pk=pk).update(
                 book_id=book_code,
                 category_id=category,
                 unit_price=price,
@@ -230,12 +240,39 @@ def CreateDelivery(request):
                 total=total,
                 date=date,
                 user_id=request.user.id
-            )
-            # if insert redirect to categories
-            if delit:
+            ):
+            # if update redirect to deliveries
+            return True
+
+@login_required
+def CreateDelivery(request):
+    if request.method=="GET":
+        return render(request, 'deliveries/deliveries_create.html')
+    else:
+        try:
+            if DeliveryOptions(request, 'add', ''):
+                # if insert redirect to deliveries
                 return redirect('deliveries')
+            else:
+                raise Exception("Unkwon Error. Contact us.")
         except Exception as err:
             return render(request, "deliveries/deliveries_create.html",{
+                'form':request.POST, 
+                'msg':{'error':err},
+            })
+
+@login_required
+def update_deliveries(request, pk):
+    if request.method=="GET":
+        deliveries=Delivery.objects.filter(pk=pk).all()
+        return render(request, 'deliveries/deliveries_update.html', {'deliveries':deliveries[0]})
+    else:
+        try:
+            if DeliveryOptions(request, 'upt', pk):
+                # if insert redirect to deliveries
+                return redirect('deliveries')
+        except Exception as err:
+            return render(request, "deliveries/deliveries_update.html",{
                 'form':request.POST, 
                 'msg':{'error':err},
             })
