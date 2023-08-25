@@ -4,9 +4,41 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Categories, Books, Delivery, DeliveryProspect
-from datetime import date
+from datetime import date, timedelta
 from django.db.models import Sum, DecimalField, IntegerField, OuterRef, Subquery
+import random
 # Create your views here.
+
+# insert aleatory
+# start_date = date(2023, 8, 26)
+# end_date = date(2023, 8, 31)
+# delta = timedelta(days=1)
+# while start_date <= end_date:
+#     print(start_date.strftime("%Y-%m-%d"))
+#     for i in range(30):
+#         book=random.randint(1,11)
+#         book_data=Books.objects.filter(pk=book).all()
+#         category=book_data[0].category_id
+#         price=book_data[0].distribution_expense
+#         qty=random.randint(1,5)
+#         total=int(qty)*float(price)
+#         total=float(f'{total:.2f}')
+#         fecha=start_date.strftime("%Y-%m-%d")
+#         print(fecha)
+
+#         delit=Delivery.objects.create(
+#             book_id=book,
+#             category_id=category,
+#             unit_price=price,
+#             qty=qty,
+#             total=total,
+#             date=fecha,
+#             user_id=1
+#         )
+#     start_date += delta
+
+
+
 
 @login_required
 def index(request):
@@ -82,9 +114,13 @@ def index(request):
     last_deliveries=Delivery.objects.all().order_by('-date','-id')[:limit3]
     # print(last_deliveries)
 
+    area_chart=Delivery.objects.filter(date__month=month).values('date').annotate(
+    total=Sum(('total'), output_field=DecimalField()),
+    category_name=Subquery(cat_subquery))
+
     return render(request, 'index.html',{'user':request.user, 'data':{'dev_today':deliveries_today,
     'dev_month':deliveries_month}, 'chart_today':chart_today, 'chart_month':chart_month,
-    'top_today':top_today, 'top_month':top_month, "last":last_deliveries})
+    'top_today':top_today, 'top_month':top_month, "last":last_deliveries, 'area_chart':area_chart})
 
 def validate(field, value):
     # validate no only spaces
@@ -268,9 +304,9 @@ def remove_book(request, pk):
 @login_required
 def DeliveryView(request):
     if request.method=="GET":
-        deliveries=Delivery.objects.filter(active=True).all()
+        deliveries=Delivery.objects.filter(active=True).all().order_by('-date','-id')[:10]
         return render(request, 'deliveries/deliveries.html', {'deliveries':deliveries})
-
+    
 def DeliveryOptions(request, t, pk):
     # get category from POST
     
