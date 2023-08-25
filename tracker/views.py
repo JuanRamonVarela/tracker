@@ -145,7 +145,8 @@ def validate(field, value):
 
         if just_symbols:
             raise Exception("The "+field+" can't be just symbols")
-    
+
+@login_required
 def CategoriesView(request):
     categories=Categories.objects.filter(active=True).all()
     return render(request, 'categories/categories.html',{'data':categories})
