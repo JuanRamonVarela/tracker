@@ -3,10 +3,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .models import Categories, Books, Delivery, DeliveryProspect
+from .models import Categories, Books, Delivery
 from datetime import date, timedelta
 from django.db.models import Sum, DecimalField, IntegerField, OuterRef, Subquery
-from django.views import generic
+from django.db import IntegrityError
+
 # Create your views here.
 
 # insert aleatory
@@ -38,7 +39,7 @@ from django.views import generic
 #     start_date += delta
 
 
-
+# Test data, check 404, make data filter and pagination
 
 @login_required
 def index(request):
@@ -381,6 +382,8 @@ def CreateDelivery(request):
 def update_deliveries(request, pk):
     if request.method=="GET":
         deliveries=Delivery.objects.filter(pk=pk).all()
+        if len(deliveries)==0:
+            return redirect('404')
         return render(request, 'deliveries/deliveries_update.html', {'deliveries':deliveries[0]})
     else:
         try:
@@ -410,6 +413,34 @@ def ReportView(request):
 def not_found(request):
     return render(request, '404.html')
 
+def signup(request):
+    ### if method is Get
+    if request.method=="GET":
+        return render(request, 'signup.html')
+    else:
+        if request.POST['password1']==request.POST["password2"]:
+            try:
+                user=User.objects.create_user(username=request.POST["username"], 
+                                              password=request.POST["password1"])
+                user.save()
+                login(request, user)
+                return redirect("index")
+            except InterruptedError:
+                return render(request, 'signup.html',{
+                            'form':{'username':request.POST['username']},
+                            'error':"Usario Registrado"
+                        })
+            except IntegrityError:
+                return render(request, 'signup.html',{
+                            'form':{'username':request.POST['username']},
+                            'error':"Usario Registrado"
+                        })
+            
+        return render(request, 'signup.html',{
+            'form':{'username':request.POST['username']},
+            'error':"Passwords no match"
+        })
+
 def signin(request):
     if request.method=="GET":
         return render(request, 'signin.html',{
@@ -421,8 +452,13 @@ def signin(request):
         if user is None:
             return render(request, 'signin.html',{
             'form':AuthenticationForm,
-            'error':'Usuario o contrasena incorrecto'
+            'error':'User or password wrong. Please try again'
             })
         else:
             login(request, user)
             return redirect('index')
+
+@login_required
+def signout(request):
+    logout(request)
+    return redirect('signin')

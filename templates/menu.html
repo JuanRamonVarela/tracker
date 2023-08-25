@@ -2,7 +2,7 @@
 <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
-
+    {% if request.user.username == 'admin' %}
     <li class="nav-item">
         <a class="nav-link" id="tab-dashboard" href="{% url 'index' %}">
             <i class="fa-brands fa-slideshare"></i>
@@ -40,19 +40,43 @@
         </a>
     </li><!-- End Contact Page Nav -->
 
-    <!-- <li class="nav-item">
-        <a class="nav-link" id="tab-chart" href="pages-register.html">
-            <i class="fa-regular fa-chart-bar"></i>
-            <span>&nbsp;Chart</span>
+    <li class="nav-item">
+        <a class="nav-link" id="tab-users" href="{% url 'signout' %}">
+            <i class="fa-solid fa-power-off"></i>
+            <span>&nbsp;Log Out</span>
         </a>
-    </li>End Register Page Nav -->
-
-    <!-- <li class="nav-item">
-        <a class="nav-link" id="tab-users" href="pages-login.html">
-            <i class="fa-solid fa-address-card"></i>
-            <span>&nbsp;Users</span>
-        </a>
-    </li>End Login Page Nav -->
-
+    </li>
     </ul>
+    {% else %}
+
+    <li class="nav-item">
+        <a class="nav-link" id="tab-delivery" href="{% url 'deliveries' %}">
+            <i class="fa-solid fa-truck-fast"></i>
+            <span>&nbsp;Deliveries Distribution</span>
+        </a>
+    </li><!-- End Distribution Page Nav -->
+
+    <li class="nav-item">
+        <a class="nav-link" id="tab-categories" href="{% url 'categories' %}">
+            <i class="fa-solid fa-inbox"></i>
+            <span>&nbsp;Categories</span>
+        </a>
+    </li><!-- End Profile Page Nav -->
+
+    <li class="nav-item">
+        <a class="nav-link" id="tab-books" href="{% url 'books' %}">
+            <i class="fa-solid fa-book"></i>
+            <span>&nbsp;Books</span>
+        </a>
+    </li><!-- End F.A.Q Page Nav -->
+
+    <li class="nav-item">
+        <a class="nav-link" id="tab-users" href="{% url 'signout' %}">
+            <i class="fa-solid fa-power-off"></i>
+            <span>&nbsp;Log Out</span>
+        </a>
+    </li>
+    </ul>
+    {% endif %}
+    
 </aside><!-- End Sidebar-->

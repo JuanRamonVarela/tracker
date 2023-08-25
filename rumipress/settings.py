@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-937!tps&@37jf2_fcfm*__6&#ymwd(5hbdr4blfkmjrb2fkz^e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -122,11 +122,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS=[
     BASE_DIR / "static"
 ]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+LOGIN_URL = '/signin'
 # INTERNAL_IPS={
 #     '127.0.0.1',
 # }

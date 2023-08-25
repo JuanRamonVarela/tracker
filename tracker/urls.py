@@ -26,7 +26,15 @@ urlpatterns=[
     # reports url
     path('reports/', views.ReportView, name='reports'),
 
+    # signup url
+    path('signup/', views.signup, name='signup'),
+
     # login url
-    path('login/', views.signin, name='signing'),
+    path('signin/', views.signin, name='signin'),
+
+    # error 404
     path('404/', views.not_found, name='404' ),
+
+    # log out
+    path('signout/', views.signout, name='signout'),
 ]

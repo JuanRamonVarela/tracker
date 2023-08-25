@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
+{% if request.user.username != 'admin' %}
+<script>
+  window.location.href='{% url "deliveries" %}'
+</script>
+{% endif %}
 {% load static %}
 <main id="main" class="main">
 
