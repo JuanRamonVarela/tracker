@@ -13,7 +13,8 @@ class Categories(models.Model):
         unique_together = ('id', 'category')
 
     def __str__(self):
-        return self.category
+        return f'{self.category}:{str(self.user)}'
+    
     
 class Books(models.Model):
     book_code=models.IntegerField()
