@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Categories, Books, Delivery, DeliveryProspect
 from datetime import date, timedelta
 from django.db.models import Sum, DecimalField, IntegerField, OuterRef, Subquery
-import random
+from django.views import generic
 # Create your views here.
 
 # insert aleatory
@@ -302,11 +302,14 @@ def remove_book(request, pk):
     else:
         return redirect('404')
 
+def getDeliveries(limit):
+    deliveries=Delivery.objects.filter(active=True).all().order_by('-date','-id')[:limit]
+    return deliveries
+
 @login_required
 def DeliveryView(request):
     if request.method=="GET":
-        deliveries=Delivery.objects.filter(active=True).all().order_by('-date','-id')[:10]
-        return render(request, 'deliveries/deliveries.html', {'deliveries':deliveries})
+        return render(request, 'deliveries/deliveries.html', {'deliveries':getDeliveries(10)})
     
 def DeliveryOptions(request, t, pk):
     # get category from POST
@@ -399,6 +402,10 @@ def remove_deliveries(request, pk):
             return redirect('deliveries')
     else:
         return redirect('404')
+
+def ReportView(request):
+    if request.method=="GET":
+        return render(request, 'reports/reports.html', {'deliveries':getDeliveries(15)})
 
 def not_found(request):
     return render(request, '404.html')

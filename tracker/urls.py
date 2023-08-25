@@ -23,6 +23,9 @@ urlpatterns=[
     path('delivery/<int:pk>/update/', views.update_deliveries, name='update_deliveries'),
     path('delivery/<int:pk>/remove/', views.remove_deliveries, name='remove_deliveries'),
     
+    # reports url
+    path('reports/', views.ReportView, name='reports'),
+
     # login url
     path('login/', views.signin, name='signing'),
     path('404/', views.not_found, name='404' ),
