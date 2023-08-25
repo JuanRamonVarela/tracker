@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Categories, Books, Delivery, DeliveryProspect
 from datetime import date
-from django.db.models import Sum, DecimalField, OuterRef, Subquery
+from django.db.models import Sum, DecimalField, IntegerField, OuterRef, Subquery
 # Create your views here.
 
 @login_required
@@ -21,19 +21,70 @@ def index(request):
 
     # prepare a subquery to get categories name
     cat_subquery=Categories.objects.filter(id=OuterRef('category_id')).values('category')
+     # get total and cateries name by today
     chart_today=Delivery.objects.filter(date=today).values('category').annotate(
     total=Sum(('total'), output_field=DecimalField()),
-    # get total and cateries name by today
     category_name=Subquery(cat_subquery))
     # get total and cateries name by month
     chart_month=Delivery.objects.filter(date__month=month).values('category').annotate(
     total=Sum(('total'), output_field=DecimalField()),
     category_name=Subquery(cat_subquery))
+    
+    #Report month categories line
 
-    print(chart_today)
-    #print(deliveries_today)
+    # top books today
+    book_subquery=Books.objects.filter(id=OuterRef('book_id')).values('title')
+    book_code_subquery=Books.objects.filter(id=OuterRef('book_id')).values('book_code')
+    
+    # handling error when records lower than limit
+    def getTopToday(limit):
+        try:
+            top_today=Delivery.objects.filter(date=today).values('book_id').annotate(
+            total=Sum('total', output_field=DecimalField()), qty=Sum('qty', output_field=IntegerField()), 
+            title= Subquery(book_subquery), code= Subquery(book_code_subquery)).order_by('-qty')[:limit]
+            return top_today
+        except IndexError:
+            if limit==0:
+                top_today={'no-info':"No information to show"}
+                return top_today
+    
+            return None
+    
+    limit=5
+    top_today=getTopToday(limit)
+    while(top_today==None):
+        limit=limit-1
+        top_today=getTopToday(limit)
+
+    #funtion to get top 5 at the month
+    def getTopMonth(limit):
+        try:
+            top_month=Delivery.objects.filter(date__month=month).values('book_id').annotate(
+            total=Sum('total', output_field=DecimalField()), qty=Sum('qty', output_field=IntegerField()), 
+            title= Subquery(book_subquery), code= Subquery(book_code_subquery)).order_by('-qty')[:limit]
+            return top_month
+        except IndexError:
+            # if limit records 0 no results yet 
+            if limit==0:
+                top_month={'no-info':"No information to show"}
+                return top_month
+            # if out of range
+            return None
+    # limit records
+    limit2=5
+    top_month=getTopMonth(limit2)
+    while(top_month==None):
+        limit2=limit2-1
+        top_month=getTopMonth(limit2)
+
+    #get lasts deliveries
+    limit3=5
+    last_deliveries=Delivery.objects.all().order_by('-date','-id')[:limit3]
+    # print(last_deliveries)
+
     return render(request, 'index.html',{'user':request.user, 'data':{'dev_today':deliveries_today,
-    'dev_month':deliveries_month}, 'chart_today':chart_today, 'chart_month':chart_month})
+    'dev_month':deliveries_month}, 'chart_today':chart_today, 'chart_month':chart_month,
+    'top_today':top_today, 'top_month':top_month, "last":last_deliveries})
 
 def validate(field, value):
     # validate no only spaces
