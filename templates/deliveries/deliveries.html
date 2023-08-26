@@ -16,11 +16,25 @@
         <div class="col-lg-12">
 
           <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">BOOKS DELIVERED</h5>
-                <a href="{% url 'create_deliveries'%}" class="btn btn-primary">
+            <div class="card-body" style="overflow-x: auto;">
+              <h5 class="card-title">BOOKS DELIVERED TODAY</h5>
+                <div class="mb-2">
+                  <a href="{% url 'create_deliveries'%}" class="btn btn-primary">
                     <i class="fa fa-plus-square"></i> New Delivery
                 </a>
+                </div>
+                <form method="post">
+                  {% csrf_token %}
+                  <div class="row">
+                  <div class="col-10">
+                    <input type="search" name="title" class="form-control" id="title" placeholder="Title" onkeypress='return validateKeypress(/[ a-zA-Z0-9ñÑáéíóúÁÉÍÓÚüÜ.!()+=&-]/g)'>
+                  </div>
+                  <div class="col-2">
+                    <button class="btn btn-primary">Search</button>
+                  </div>
+                </div>
+                  
+                </form>
               <table class="table table-hover table-bordered  table-responsive mt-2">
                   <thead>
                       <th>Title</th>
@@ -32,7 +46,7 @@
                       <th>Options</th>
                   </thead>
                   <tbody>
-                    {% for delivery in deliveries %}
+                    {% for delivery in entity %}
                         <tr>
                             <td>{{delivery.book.title}}</td>
                             <td>{{delivery.book.author}}</td>
@@ -54,6 +68,7 @@
                     {% endfor %}
                   </tbody>
               </table>
+              {% include 'paginator.html' %}
             </div>
           </div>
         </div>

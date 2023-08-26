@@ -28,7 +28,7 @@
                       <th>Options</th>
                   </thead>
                   <tbody>
-                    {% for category in data %}
+                    {% for category in entity %}
                     <tr>
                       <td>{{category.id}}</td>
                       <td>{{category.category}}</td>
@@ -52,6 +52,7 @@
                     {% endfor %}
                   </tbody>
               </table>
+              {% include 'paginator.html' %}
             </div>
           </div>
         </div>

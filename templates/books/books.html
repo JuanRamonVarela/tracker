@@ -33,14 +33,14 @@
                       <th>Options</th>
                   </thead>
                   <tbody>
-                    {% for book in books %}
+                    {% for book in entity %}
                         <tr>
                             <td>{{book.book_code}}</td>
                             <td>{{book.title}}</td>
                             <td>{{book.subtitle}}</td>
                             <td>{{book.author}}</td>
                             <td>{{book.publishing_date}}</td>
-                            <td>{{book.category}}</td>
+                            <td>{{book.category.category}}</td>
                             <td>{{book.distribution_expense}}</td>
                             <td>
                               <a href="{% url 'update_book' book.id %}" class="text-info">
@@ -56,6 +56,7 @@
                     {% endfor %}
                   </tbody>
               </table>
+              {% include 'paginator.html' %}
             </div>
           </div>
         </div>

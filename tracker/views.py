@@ -1,18 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Categories, Books, Delivery
 from datetime import date, timedelta
 from django.db.models import Sum, DecimalField, IntegerField, OuterRef, Subquery
 from django.db import IntegrityError
-
+from django.core.paginator import Paginator
+from django.http import Http404
+import random
 # Create your views here.
 
-# insert aleatory
+# insert aleatory using random and time delta
 # start_date = date(2023, 8, 26)
-# end_date = date(2023, 8, 31)
+# end_date = date(2023, 12, 31)
 # delta = timedelta(days=1)
 # while start_date <= end_date:
 #     print(start_date.strftime("%Y-%m-%d"))
@@ -147,23 +149,27 @@ def validate(field, value):
         if just_symbols:
             raise Exception("The "+field+" can't be just symbols")
 
-@login_required
-def CategoriesView(request):
-    categories=Categories.objects.filter(active=True).all()
-    return render(request, 'categories/categories.html',{'data':categories})
-
-def getDeliveries(limit):
-    deliveries=Delivery.objects.filter(active=True).all().order_by('-date','-id')[:limit]
-    return deliveries
 
 @login_required
 def DeliveryView(request):
     if request.method=="GET":
-        return render(request, 'deliveries/deliveries.html', {'deliveries':getDeliveries(10)})
+        today = date.today().strftime("%Y-%m-%d")
+        page=request.GET.get('page',1)
+        deliveries=Delivery.objects.filter(active=True, date=today).all().order_by('-date','-id')
+        try:
+            paginator=Paginator(deliveries,5)
+            deliveries=paginator.page(page)
+        except:
+            raise Http404
+        return render(request, 'deliveries/deliveries.html', {'entity':deliveries, 'paginator':paginator})
+        
+    else:
+        # print(request.POST)
+        deliveries=Delivery.objects.filter(active=True).all().order_by('-date','-id')
+        return render(request, 'deliveries/deliveries.html', {'data':request.POST,'deliveries':deliveries})
     
 def DeliveryOptions(request, t, pk):
     # get category from POST
-    
     book=request.POST['book_code']
     qty=request.POST["qty"]
     date=request.POST['date']
@@ -256,6 +262,21 @@ def remove_deliveries(request, pk):
         return redirect('404')
 
 @login_required
+def CategoriesView(request):
+    if request.method=="GET":
+        page=request.GET.get('page',1)
+        categories=Categories.objects.filter(active=True).all().order_by('category')
+        try:
+            paginator=Paginator(categories,2)
+            categories=paginator.page(page)
+        except:
+            raise Http404
+        
+        return render(request, 'categories/categories.html',{'entity':categories, 'paginator':paginator})
+    else:
+        redirect('categories')
+
+@login_required
 def CreateCategory(request):
     if request.method=="GET":
         return render(request, 'categories/categories_create.html')
@@ -307,8 +328,15 @@ def remove_category(request, pk):
 @login_required
 def BooksView(request):
     if request.method=="GET":
-        books=Books.objects.filter(active=True).all()
-        return render(request, 'books/books.html',{'books':books})
+        page=request.GET.get('page',1)
+        books=Books.objects.filter(active=True).all().order_by('-publishing_date', '-id')
+        try:
+            paginator=Paginator(books,2)
+            books=paginator.page(page)
+        except:
+            raise Http404
+        
+        return render(request, 'books/books.html',{'entity':books, 'paginator':paginator})
 
 # define categories to use in books forms
 categories=Categories.objects.filter(active=True).all().values('id','category').order_by('category')
@@ -408,7 +436,15 @@ def remove_book(request, pk):
 
 def ReportView(request):
     if request.method=="GET":
-        return render(request, 'reports/reports.html', {'deliveries':getDeliveries(15)})
+        page=request.GET.get('page',1)
+        deliveries=Delivery.objects.filter(active=True).all().order_by('-date','-id')
+        try:
+            paginator=Paginator(deliveries,5)
+            deliveries=paginator.page(page)
+        except:
+            raise Http404
+        
+        return render(request, 'reports/reports.html', {'entity':deliveries, 'paginator':paginator})
 
 def not_found(request):
     return render(request, '404.html')
