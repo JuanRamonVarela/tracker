@@ -1,4 +1,103 @@
 {% if paginator.num_pages > 1 %}
+{% load my_tags %}
+{% if filters|length > 0 %}
+
+<!-- search filters in for loop -->
+{% for row in filters %}
+    <!-- concat filters name and values -->
+    {{row.value}}
+    {% with '&'|add:row.name|add:'='|add:row.value as concatenado %}
+    <!-- update the filter value -->
+    {% update_variable filter concatenado as filter %}
+    {% endwith %}
+{% endfor %}
+{% searchFilter %}
+<!-- assigning the filters in the url -->
+<div class="d-flex justify-content-center">
+    <ul class="pagination">
+        {% if entity.has_previous %}
+            <li class="page-item d-none d-sm-block">
+                <a class="page-link" href="?page=1{% searchFilter %}">
+                    <i class="fa-solid fa-backward-fast"></i>
+                </a>
+            </li>
+            <li class="page-item d-none d-sm-block">
+                <a class="page-link" href="?page={{ entity.previous_page_number }}{% searchFilter %}">
+                    <i class="fa-solid fa-backward-step"></i>
+                </a>
+            </li>
+        {% endif %}
+        {% for page in paginator.page_range %}
+            {% if page <= 7 and entity.number|add:3 < 8 %}
+                {% if entity.number <= 4  %}
+                    <li class="page-item {% if page == entity.number %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page }}{% searchFilter %}">{{ page  }}</a>
+                    </li>
+                {% elif page >= entity.number|add:-3 and page <= entity.number|add:4 %}
+                    <li class="page-item {% if page == entity.number %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page }}{% searchFilter %}">{{ page  }}</a>
+                    </li>
+                {% endif%}
+            {%elif page >= entity.number|add:-3 and page <= entity.number|add:3 and entity.number < paginator.num_pages|add:-2 %}
+                <li class="page-item {% if page == entity.number %}active{% endif %}">
+                    <a class="page-link" href="?page={{ page }}{% searchFilter %}">{{ page  }}</a>
+                </li>
+            {%elif page >= entity.number|add:-4 and page <= entity.number|add:3 and entity.number == paginator.num_pages|add:-2 %}
+                <li class="page-item {% if page == entity.number %}active{% endif %}">
+                    <a class="page-link" href="?page={{ page }}{% searchFilter %}">{{ page  }}</a>
+                </li>
+            {%elif page >= entity.number|add:-5 and page <= entity.number|add:3 and entity.number == paginator.num_pages|add:-1 %}
+                <li class="page-item {% if page == entity.number %}active{% endif %}">
+                    <a class="page-link" href="?page={{ page }}{% searchFilter %}">{{ page  }}</a>
+                </li>
+            {%elif page >= entity.number|add:-5 and page <= entity.number|add:3 and entity.number == paginator.num_pages%}
+                <li class="page-item {% if page == entity.number %}active{% endif %}">
+                    <a class="page-link" href="?page={{ page }}{% searchFilter %}">{{ page  }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        {% if entity.has_next %}
+            <li class="page-item d-none d-sm-block">
+                <a class="page-link" href="?page={{ entity.next_page_number }}{% searchFilter %}"><i class="fa-solid fa-forward-step"></i></a>
+            </li>
+            <li class="page-item d-none d-sm-block">
+                <a class="page-link" href="?page={{paginator.num_pages}}{% searchFilter %}"><i class="fa-solid fa-forward-fast"></i></a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+<div class="d-flex justify-content-center d-sm-none">            
+    {% if entity.has_previous %}
+        <span class="page-item">
+            <a class="page-link text-primary" href="?page=1">
+                <i class="fa-solid fa-backward-fast"></i>
+            </a>
+        </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="page-item">
+            <a  class="page-link text-primary" href="?page={{ entity.previous_page_number }}">
+                <i class="fa-solid fa-backward-step"></i>
+            </a>
+        </span>
+    {% endif %}
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    {% if entity.has_next %}
+        <span class="page-item d-sm-block">
+            <a class="page-link text-primary" href="?page={{ entity.next_page_number }}"><i class="fa-solid fa-forward-step"></i></a>
+        </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="page-item d-sm-block">
+            <a class="page-link text-primary" href="?page={{paginator.num_pages}}">
+                <i class="fa-solid fa-forward-fast"></i>
+            </a>
+        </span>
+    {% endif %}
+    <br>
+    <br>
+</div>
+
+{% else %}
+
 <div class="d-flex justify-content-center">
     <ul class="pagination">
         {% if entity.has_previous %}
@@ -75,4 +174,5 @@
     <br>
     <br>
 </div>
+{% endif %}
 {% endif %}

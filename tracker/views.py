@@ -10,6 +10,7 @@ from django.db import IntegrityError
 from django.core.paginator import Paginator
 from django.http import Http404
 import random
+
 # Create your views here.
 
 # insert aleatory using random and time delta
@@ -154,14 +155,21 @@ def validate(field, value):
 def DeliveryView(request):
     if request.method=="GET":
         today = date.today().strftime("%Y-%m-%d")
+        filters=[]
+        title=request.GET.get('title','')
+        if title != '':
+            filters.append({'name':'title', 'value':title})
+        # for filter in filters:
+        #     print(filter['name'])
         page=request.GET.get('page',1)
         deliveries=Delivery.objects.filter(active=True, date=today).all().order_by('-date','-id')
+        
         try:
             paginator=Paginator(deliveries,5)
             deliveries=paginator.page(page)
         except:
             raise Http404
-        return render(request, 'deliveries/deliveries.html', {'entity':deliveries, 'paginator':paginator})
+        return render(request, 'deliveries/deliveries.html', {'entity':deliveries, 'paginator':paginator, 'filters':filters})
         
     else:
         # print(request.POST)
